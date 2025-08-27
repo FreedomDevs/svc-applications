@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: ""
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: svc-applications
+    ports:
+      - "5432:5432"
+    volumes:
+      - svc-applications_db:/var/lib/postgresql/data
+volumes:
+  svc-applications_db:
