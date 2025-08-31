@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
 
@@ -13,6 +14,7 @@ func main() {
 	dbName := getEnv("DB_NAME", "svc-applications")
 	dbArgs := getEnv("DB_ARGS", "sslmode=disable")
 
+	fmt.Printf("Подключение к postgres://%s:XXXXX@%s/%s?%s\n", dbUser, dbAddress, dbName, dbArgs)
 	dsn := fmt.Sprintf("postgres://%s:%s@%s/%s?%s", dbUser, dbPass, dbAddress, dbName, dbArgs)
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
@@ -21,11 +23,20 @@ func main() {
 	}
 	defer db.Close()
 
-	// Пробуем реально соединиться
 	if err := db.Ping(); err != nil {
 		fmt.Println("Ошибка подключения к БД:", err)
 		return
 	}
 
-	fmt.Println("Подключение успешно! Данные валидны.")
+	fmt.Println("Подключение успешно! База данных работает.")
+
+	r := gin.Default()
+
+	// Middleware для добавления db в контекст
+	r.Use(func(c *gin.Context) {
+		c.Set("db", db)
+		c.Next()
+	})
+
+	r.Run(":9003")
 }
