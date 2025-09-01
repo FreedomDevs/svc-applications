@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -12,27 +14,29 @@ import (
 )
 
 func main() {
+	appStart := time.Now()
 	dbAddress := getEnv("DB_ADDRESS", "localhost:5432")
 	dbUser := getEnv("DB_USER", "root")
 	dbPass := getEnv("DB_PASS", "")
 	dbName := getEnv("DB_NAME", "svc-applications")
 	dbArgs := getEnv("DB_ARGS", "sslmode=disable")
+	proxiesEnv := getEnv("TRUSTED_PROXIES", "127.0.0.1")
 
-	fmt.Printf("Подключение к postgres://%s:XXXXX@%s/%s?%s\n", dbUser, dbAddress, dbName, dbArgs)
+	log.Printf("Подключение к postgres://%s:XXXXX@%s/%s?%s\n", dbUser, dbAddress, dbName, dbArgs)
 	dsn := fmt.Sprintf("postgres://%s:%s@%s/%s?%s", dbUser, dbPass, dbAddress, dbName, dbArgs)
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		fmt.Println("Ошибка создания подключения:", err)
-		return
+		log.Fatal("Ошибка создания подключения:", err)
 	}
 	defer db.Close()
 
 	if err := db.Ping(); err != nil {
-		fmt.Println("Ошибка подключения к БД:", err)
-		return
+		log.Fatal("Ошибка подключения к БД:", err)
 	}
 
-	fmt.Println("Подключение успешно! База данных работает.")
+	log.Println("Подключение успешно! База данных работает.")
+
+	log.Println("Проверка таблицы 'applications'")
 
 	createTableSQL := `
 		DO $$
@@ -76,26 +80,35 @@ func main() {
 		return
 	}
 
-	fmt.Println("Таблица 'applications' готова")
+	log.Println("Таблица 'applications' готова")
 
-	fmt.Println("Проверка API Gemini")
+	log.Println("Проверка API Gemini")
 
-	ctx := context.Background()
-	client, err := genai.NewClient(ctx, &genai.ClientConfig{ // API ключ берётся из ENV параметра GOOGLE_API_KEY
+	client, err := genai.NewClient(context.Background(), &genai.ClientConfig{ // API ключ берётся из ENV параметра GOOGLE_API_KEY
 		Backend: genai.BackendGeminiAPI,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(15*time.Second))
+	requestStart := time.Now()
+
 	result, err := client.Models.CountTokens(ctx, "gemini-2.5-flash-lite", genai.Text("Hello"), &genai.CountTokensConfig{})
+	cancel()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Gemini работает, количество тестовых токенов: %d\n", result.TotalTokens)
+	log.Printf("Gemini работает, количество тестовых токенов: %d, пинг: %s\n", result.TotalTokens, time.Since(requestStart))
 
-	r := gin.Default()
+	log.Printf("Запуск Gin спустя: %s с начала запуска программы", time.Since(appStart))
+
+	r := gin.New()
+
+	r.Use(gin.Recovery())
+	r.Use(gin.Logger())
+	r.SetTrustedProxies(strings.Split(proxiesEnv, ","))
 
 	// Middleware для добавления db в контекст
 	r.Use(func(c *gin.Context) {
