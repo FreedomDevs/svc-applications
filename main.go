@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"log"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"google.golang.org/genai"
 )
 
 func main() {
@@ -73,6 +77,23 @@ func main() {
 	}
 
 	fmt.Println("Таблица 'applications' готова")
+
+	fmt.Println("Проверка API Gemini")
+
+	ctx := context.Background()
+	client, err := genai.NewClient(ctx, &genai.ClientConfig{ // API ключ берётся из ENV параметра GOOGLE_API_KEY
+		Backend: genai.BackendGeminiAPI,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	result, err := client.Models.CountTokens(ctx, "gemini-2.5-flash-lite", genai.Text("Hello"), &genai.CountTokensConfig{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("Gemini работает, количество тестовых токенов: %d\n", result.TotalTokens)
 
 	r := gin.Default()
 

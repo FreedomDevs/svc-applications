@@ -19,3 +19,4 @@ docker compose up -d
 - DB_PASS - пароль для доступа к базе данных (По умолчанию: "")
 - DB_NAME - имя базы данных (По умолчанию "svc-applications")
 - DB_ARGS - аргументы для подключения к базе данных (По умолчанию: "sslmode=disable")
+- GOOGLE_API_KEY - API ключ для Gemini (ОБЯЗАТЕЛЬНО)
