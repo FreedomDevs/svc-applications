@@ -38,7 +38,7 @@ func main() {
 
 	log.Println("Проверка таблицы 'applications'")
 
-	createTableSQL := `
+	const createTableSQL = `
 		DO $$
 		BEGIN
     		IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'application_decision_enum') THEN
@@ -48,12 +48,11 @@ func main() {
 		$$;
 
 		create table if not exists "applications" (
-  		"id" SERIAL not null,
-  		"nickname" varchar(16) not null check (char_length(nickname) between 3 and 16 and nickname ~ '^[a-zA-Z0-9_]{3,16}$'),
+  		"id" serial not null,
+  		"userid" uuid not null,
   		"age" smallint not null check (age BETWEEN 1 AND 80),
   		"about" varchar(4096) not null,
   		"join_reason" varchar(1024) not null,
-  		"discord_nickname" varchar(32) not null check (discord_nickname ~ '^[\w\-]{2,32}$'),
   		"inviter" varchar(256) null,
   		"ai_decision" application_decision_enum not null default 'Pending',
   		"admin_decision" application_decision_enum not null default 'Pending',
@@ -62,11 +61,10 @@ func main() {
   		constraint "users_pkey" primary key ("id")
 		);
 
-		comment on column "applications"."nickname" is 'Валидный никнейм minecraft';
+		comment on column "applications"."userid" is 'UUID юзера';
 		comment on column "applications"."age" is 'Возраст игрока 1-80 лет';
 		comment on column "applications"."about" is 'Поле "О себе" длинной не более 4096 символов';
 		comment on column "applications"."join_reason" is 'Поле "Почему хотите вступить" длинной не более 1024 символов';
-		comment on column "applications"."discord_nickname" is 'Валидный discord ник, на старые ники типа example#1234 пофиг';
 		comment on column "applications"."inviter" is 'Поле "Кто вас приласил" длинной не более 256 символов, опционально и может быть null';
 		comment on column "applications"."ai_decision" is 'Мнение ИИ, принят или нет';
 		comment on column "applications"."admin_decision" is 'Мнение админов принят или нет';
