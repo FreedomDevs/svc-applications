@@ -1,0 +1,4 @@
+connections:
+  - driver: postgresql
+    dataSourceName: "root@tcp(127.0.0.1:5432)/svc-applications"
+
