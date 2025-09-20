@@ -19,7 +19,7 @@ var createTableSQL string
 
 func main() {
 	appStart := time.Now()
-	dbAddress := getEnv("DB_ADDRESS", "localhost:5432")
+	dbAddress := getEnv("DB_ADDRESS", "localhost:8003")
 	dbUser := getEnv("DB_USER", "root")
 	dbPass := getEnv("DB_PASS", "")
 	dbName := getEnv("DB_NAME", "svc-applications")
@@ -70,7 +70,7 @@ func main() {
 
 	log.Printf("Gemini работает, количество тестовых токенов: %d, пинг: %s\n", result.TotalTokens, time.Since(requestStart))
 
-	log.Printf("Запуск Gin спустя: %s с начала запуска программы", time.Since(appStart))
+	log.Println("Подготовка gin")
 
 	r := gin.New()
 
@@ -84,5 +84,11 @@ func main() {
 		c.Next()
 	})
 
+	route := r.Group("/applicatons")
+	{
+		_ = route
+	}
+
+	log.Printf("Запуск Gin спустя: %s с начала запуска программы", time.Since(appStart))
 	r.Run(":9003")
 }

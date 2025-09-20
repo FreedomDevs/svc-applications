@@ -7,8 +7,8 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_DB: svc-applications
     ports:
-      - "5432:5432"
+      - "8003:5432"
     volumes:
-      - svc-applications_db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
 volumes:
-  svc-applications_db:
+  db:
