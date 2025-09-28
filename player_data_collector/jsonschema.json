@@ -1,0 +1,57 @@
+{
+  "type": "object",
+  "properties": {
+    "twink_check": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "nickname",
+          "description"
+        ],
+        "propertyOrdering": [
+          "nickname",
+          "description"
+        ]
+      }
+    },
+    "related_players_check": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "nickname",
+          "description"
+        ],
+        "propertyOrdering": [
+          "nickname",
+          "description"
+        ]
+      }
+    }
+  },
+  "required": [
+    "twink_check",
+    "related_players_check"
+  ],
+  "propertyOrdering": [
+    "twink_check",
+    "related_players_check"
+  ]
+}

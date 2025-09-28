@@ -81,6 +81,7 @@ func main() {
 	// Middleware для добавления db в контекст
 	r.Use(func(c *gin.Context) {
 		c.Set("db", db)
+		c.Set("gemini", client)
 		c.Next()
 	})
 

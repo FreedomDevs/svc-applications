@@ -1,0 +1,48 @@
+{
+  "application": {
+    "login": "ShadowHunter42",
+    "age": 22,
+    "about": "Люблю PvP и строить редкие механизмы в Minecraft. В команде ценю честность и активность.",
+    "join_reason": "Хочу присоединиться, чтобы участвовать в крупных ивентах и помогать развивать сервер.",
+    "inviter": "KnightMaster",
+    "submitted_at": "2025-09-28T09:25:51Z"
+  },
+  "ipinfo": {
+    "city": "Frankfurt am Main",
+    "country": "DE",
+    "hostname": "a013646868.serv.host",
+    "ip": "89.169.12.59",
+    "loc": "50.1153,8.6823",
+    "org": "AS207957 SERV.HOST GROUP LTD",
+    "postal": "60313",
+    "region": "Hesse",
+    "timezone": "Europe/Berlin"
+  },
+  "discord_info": {
+    "username": "ShadowHunter",
+    "login": "ShadowHunter42",
+    "status": "🌅Cause you're hot, then you're cold",
+    "created_at": "2015-12-07T16:13:12.216000Z",
+    "email": "sm44aksdmiki13877kfh@gmail.com",
+    "email_verified": true,
+    "mfa_enabled": true,
+    "locale": "ru-RU",
+    "connections": {
+      "youtube": {
+        "name": "shadow hunter",
+        "verified": true
+      }
+    }
+  },
+  "previous_applications": [
+    {
+      "login": "ShadowHunter42",
+      "inviter": null,
+      "about": "PvP",
+      "join_reason": "Хочу играть",
+      "submitted_at": "2025-09-28T09:14:10Z",
+      "status": "rejected",
+      "rejection_reason": "Короткое описание заявки: слишком мало информации о игроке."
+    }
+  ]
+}
