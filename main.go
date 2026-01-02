@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
-	"database/sql"
+	"svc-applications/first_parser"
+	//	"database/sql"
 	_ "embed"
-	"fmt"
+	//	"fmt"
 	"log"
 	//"strings"
 	"time"
@@ -18,37 +19,39 @@ import (
 var createTableSQL string
 
 func main() {
-	//appStart := time.Now()
-	dbAddress := getEnv("DB_ADDRESS", "localhost:8003")
-	dbUser := getEnv("DB_USER", "root")
-	dbPass := getEnv("DB_PASS", "")
-	dbName := getEnv("DB_NAME", "svc-applications")
-	dbArgs := getEnv("DB_ARGS", "sslmode=disable")
-	//proxiesEnv := getEnv("TRUSTED_PROXIES", "127.0.0.1")
+	/*
+		//appStart := time.Now()
+		dbAddress := getEnv("DB_ADDRESS", "localhost:8003")
+		dbUser := getEnv("DB_USER", "root")
+		dbPass := getEnv("DB_PASS", "")
+		dbName := getEnv("DB_NAME", "svc-applications")
+		dbArgs := getEnv("DB_ARGS", "sslmode=disable")
+		//proxiesEnv := getEnv("TRUSTED_PROXIES", "127.0.0.1")
 
-	log.Printf("Подключение к postgres://%s:XXXXX@%s/%s?%s\n", dbUser, dbAddress, dbName, dbArgs)
-	dsn := fmt.Sprintf("postgres://%s:%s@%s/%s?%s", dbUser, dbPass, dbAddress, dbName, dbArgs)
-	db, err := sql.Open("postgres", dsn)
-	if err != nil {
-		log.Fatal("Ошибка создания подключения:", err)
-	}
-	defer db.Close()
+		log.Printf("Подключение к postgres://%s:XXXXX@%s/%s?%s\n", dbUser, dbAddress, dbName, dbArgs)
+		dsn := fmt.Sprintf("postgres://%s:%s@%s/%s?%s", dbUser, dbPass, dbAddress, dbName, dbArgs)
+		db, err := sql.Open("postgres", dsn)
+		if err != nil {
+			log.Fatal("Ошибка создания подключения:", err)
+		}
+		defer db.Close()
 
-	if err := db.Ping(); err != nil {
-		log.Fatal("Ошибка подключения к БД:", err)
-	}
+		if err := db.Ping(); err != nil {
+			log.Fatal("Ошибка подключения к БД:", err)
+		}
 
-	log.Println("Подключение успешно! База данных работает.")
+		log.Println("Подключение успешно! База данных работает.")
 
-	log.Println("Проверка таблицы 'applications'")
+		log.Println("Проверка таблицы 'applications'")
 
-	_, err = db.Exec(createTableSQL)
-	if err != nil {
-		fmt.Println("Ошибка при проверке таблицы 'applications': ", err)
-		return
-	}
+		_, err = db.Exec(createTableSQL)
+		if err != nil {
+			fmt.Println("Ошибка при проверке таблицы 'applications': ", err)
+			return
+		}
 
-	log.Println("Таблица 'applications' готова")
+		log.Println("Таблица 'applications' готова")
+	*/
 
 	log.Println("Проверка API Gemini")
 
@@ -59,30 +62,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(15*time.Second))
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	contents := []*genai.Content{
-		{
-			Role: "user",
-			Parts: []*genai.Part{
-				genai.NewPartFromText(
-					"Ты — анализатор заявки. Выдели ники друзей и классифицируй заявку.\n" +
-						"Ник игрока: mikinol\n" +
-						"Возраст игрока: 17 лет\n" +
-						"Почему хочу играть: Хочу присоединиться к вашему серверу, потому что люблю строить сложные механизмы в Minecraft и играть вместе с друзьями. Раньше играл на нескольких крупных проектах, хочу найти активное сообщество для креатива и PvP.\n" +
-						"В дискорд-сообществе Minecraft RP, друг порекомендовал",
-				),
-			},
-		},
-	}
+	nickname := "mikinol"
+	age := "16 лет"
+	about := "Ну тип я Ярик, мне 16 лет. Я не особо ютубер, но если сервер понравится, может какие-то анимации буду делать. Я 2д аниматор. Я достаточно малообщителен, но люблю уделять время большим проектам.	Ну я просто хочу поиграть на сервере подобно этому + у меня там играет друг."
+	inviter_by := "PerchicYT"
 
-	result, err := client.Models.GenerateContent(ctx, "gemma-3-27b-it", contents, nil)
+	result, err := first_parser.SendRequest(nickname, age, about, inviter_by, ctx, client)
 	if err != nil {
 		log.Printf("%v", err)
 		return
 	}
-	log.Printf("%v", result.Text())
+	log.Printf("%v", "\n"+result.Text())
 
 	/*
 		requestStart := time.Now()
