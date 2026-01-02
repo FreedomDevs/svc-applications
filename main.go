@@ -67,10 +67,11 @@ func main() {
 
 	nickname := "mikinol"
 	age := "16 лет"
+	join_reason := "Ну я просто хочу поиграть на сервере подобно этому + у меня там играет друг PerchicYT."
 	about := "Ну тип я Ярик, мне 16 лет. Я не особо ютубер, но если сервер понравится, может какие-то анимации буду делать. Я 2д аниматор. Я достаточно малообщителен, но люблю уделять время большим проектам.	Ну я просто хочу поиграть на сервере подобно этому + у меня там играет друг."
 	inviter_by := "PerchicYT"
 
-	result, err := first_parser.SendRequest(nickname, age, about, inviter_by, ctx, client)
+	result, err := first_parser.SendRequest(nickname, age, join_reason, about, inviter_by, ctx, client)
 	if err != nil {
 		log.Printf("%v", err)
 		return

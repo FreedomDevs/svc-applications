@@ -28,5 +28,6 @@ categories:
 # **User's application**:
 Nickname: %nickname%
 Age: %age%
+Join reason: %join_reason%
 About: %about%
 Invited by: %invited_by%
