@@ -6,10 +6,10 @@ import (
 	_ "embed"
 	"fmt"
 	"log"
-	"strings"
+	//"strings"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	//"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 	"google.golang.org/genai"
 )
@@ -18,13 +18,13 @@ import (
 var createTableSQL string
 
 func main() {
-	appStart := time.Now()
+	//appStart := time.Now()
 	dbAddress := getEnv("DB_ADDRESS", "localhost:8003")
 	dbUser := getEnv("DB_USER", "root")
 	dbPass := getEnv("DB_PASS", "")
 	dbName := getEnv("DB_NAME", "svc-applications")
 	dbArgs := getEnv("DB_ARGS", "sslmode=disable")
-	proxiesEnv := getEnv("TRUSTED_PROXIES", "127.0.0.1")
+	//proxiesEnv := getEnv("TRUSTED_PROXIES", "127.0.0.1")
 
 	log.Printf("Подключение к postgres://%s:XXXXX@%s/%s?%s\n", dbUser, dbAddress, dbName, dbArgs)
 	dsn := fmt.Sprintf("postgres://%s:%s@%s/%s?%s", dbUser, dbPass, dbAddress, dbName, dbArgs)
@@ -60,36 +60,64 @@ func main() {
 	}
 
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(15*time.Second))
-	requestStart := time.Now()
+	defer cancel()
 
-	result, err := client.Models.CountTokens(ctx, "gemini-2.5-flash-lite", genai.Text("Hello"), &genai.CountTokensConfig{})
-	cancel()
+	contents := []*genai.Content{
+		{
+			Role: "user",
+			Parts: []*genai.Part{
+				genai.NewPartFromText(
+					"Ты — анализатор заявки. Выдели ники друзей и классифицируй заявку.\n" +
+						"Ник игрока: mikinol\n" +
+						"Возраст игрока: 17 лет\n" +
+						"Почему хочу играть: Хочу присоединиться к вашему серверу, потому что люблю строить сложные механизмы в Minecraft и играть вместе с друзьями. Раньше играл на нескольких крупных проектах, хочу найти активное сообщество для креатива и PvP.\n" +
+						"В дискорд-сообществе Minecraft RP, друг порекомендовал",
+				),
+			},
+		},
+	}
+
+	result, err := client.Models.GenerateContent(ctx, "gemma-3-27b-it", contents, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%v", err)
+		return
 	}
+	log.Printf("%v", result.Text())
 
-	log.Printf("Gemini работает, количество тестовых токенов: %d, пинг: %s\n", result.TotalTokens, time.Since(requestStart))
+	/*
+		requestStart := time.Now()
 
-	log.Println("Подготовка gin")
+			result, err := client.Models.CountTokens(ctx, "gemini-2.5-flash-lite", genai.Text("Hello"), &genai.CountTokensConfig{})
+			cancel()
+			if err != nil {
+				log.Fatal(err)
+			}
 
-	r := gin.New()
+			log.Printf("Gemini работает, количество тестовых токенов: %d, пинг: %s\n", result.TotalTokens, time.Since(requestStart))
 
-	r.Use(gin.Recovery())
-	r.Use(gin.Logger())
-	r.SetTrustedProxies(strings.Split(proxiesEnv, ","))
 
-	// Middleware для добавления db в контекст
-	r.Use(func(c *gin.Context) {
-		c.Set("db", db)
-		c.Set("gemini", client)
-		c.Next()
-	})
 
-	route := r.Group("/applicatons")
-	{
-		_ = route
-	}
+				log.Println("Подготовка gin")
 
-	log.Printf("Запуск Gin спустя: %s с начала запуска программы", time.Since(appStart))
-	r.Run(":9003")
+				r := gin.New()
+
+				r.Use(gin.Recovery())
+				r.Use(gin.Logger())
+				r.SetTrustedProxies(strings.Split(proxiesEnv, ","))
+
+				// Middleware для добавления db в контекст
+				r.Use(func(c *gin.Context) {
+					c.Set("db", db)
+					c.Set("gemini", client)
+					c.Next()
+				})
+
+				route := r.Group("/applicatons")
+				{
+					_ = route
+				}
+
+				log.Printf("Запуск Gin спустя: %s с начала запуска программы", time.Since(appStart))
+				r.Run(":9003")
+	*/
 }
