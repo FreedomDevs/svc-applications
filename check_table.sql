@@ -14,11 +14,12 @@ create table if not exists "applications" (
   "join_reason" varchar(1024) not null,
   "inviter" varchar(256) null,
   "submitted_at" TIMESTAMPTZ not null default NOW(),
+  "ai_categories" JSONB,
   "ai_decision" application_decision_enum not null default 'Pending',
   "admin_decision" application_decision_enum not null default 'Pending',
   "ai_answer" VARCHAR(1024),
   "ai_comment" VARCHAR(4096),
-  constraint "users_pkey" primary key ("id")
+ constraint "users_pkey" primary key ("id")
 );
 
 comment on column "applications"."userid" is 'UUID юзера';
@@ -27,6 +28,7 @@ comment on column "applications"."about" is 'Поле "О себе" длинно
 comment on column "applications"."join_reason" is 'Поле "Почему хотите вступить" длинной не более 1024 символов';
 comment on column "applications"."inviter" is 'Поле "Кто вас приласил" длинной не более 256 символов, опционально и может быть null';
 comment on column "applications"."submitted_at" is 'Дата и время когда была создана заявка';
+comment on column "applications"."ai_categories" is 'Категории от ИИ';
 comment on column "applications"."ai_decision" is 'Мнение ИИ, принят или нет';
 comment on column "applications"."admin_decision" is 'Мнение админов принят или нет';
 comment on column "applications"."ai_answer" is 'Ответ ИИ самому игроку';

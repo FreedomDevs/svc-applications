@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "accept",
+        "reject"
+      ]
+    },
+    "comment": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "propertyOrdering": [
+    "action",
+    "comment",
+    "reason"
+  ],
+  "required": [
+    "action",
+    "comment",
+    "reason"
+  ]
+}
