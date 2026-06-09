@@ -7,7 +7,7 @@ DO $$
 $$;
 
 create table if not exists "applications" (
-  "id" serial not null,
+  "id" uuid not null,
   "userid" uuid not null,
   "age" smallint not null check (age BETWEEN 1 AND 80),
   "about" varchar(4096) not null,
