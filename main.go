@@ -137,7 +137,7 @@ func main() {
 			return
 		}
 
-		ctx.Writer.Write([]byte("Классификация заявки..."))
+		ctx.Writer.Write([]byte("Классификация заявки...\n"))
 		ctx.Writer.Flush()
 
 		classify_response, err := first_parser.SendRequest(username, string(req.age), req.join_reason, req.about, req.inviter, context.Background(), gemini)
@@ -148,7 +148,7 @@ func main() {
 
 		classify_data := first_parser.ParseSomeDataData(classify_response.Text())
 
-		ctx.Writer.Write([]byte("\nВыносим финальный вердикт..."))
+		ctx.Writer.Write([]byte("Выносим финальный вердикт...\n"))
 		ctx.Writer.Flush()
 
 		verdict_response, err := final_reviewer.SendRequest(classify_data, username, string(req.age), req.join_reason, req.about, req.inviter, context.Background(), gemini)
@@ -165,7 +165,7 @@ func main() {
 		}
 
 		fmt.Printf("\n\n%v\n", verdict_json)
-		ctx.Writer.Write([]byte(fmt.Sprintf("\n{\"action\": \"%s\", \"answer\": \"%s\"}", verdict_json["action"], verdict_json["reason"])))
+		ctx.Writer.Write([]byte(fmt.Sprintf("{\"action\": \"%s\", \"answer\": \"%s\"}\n", verdict_json["action"], verdict_json["reason"])))
 	})
 
 	log.Printf("Запуск Gin спустя: %s с начала запуска программы", time.Since(appStart))

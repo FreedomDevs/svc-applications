@@ -36,15 +36,15 @@ func SendRequest(nickname string, age string, join_reason string, about string, 
 }
 
 type UserProfile struct {
-	Friends          []string               `json:"friends"`
-	MentionedServers []string               `json:"mentioned_servers"`
-	Categories       map[string]interface{} `json:"categories"`
+	Friends          []string       `json:"friends"`
+	MentionedServers []string       `json:"mentioned_servers"`
+	Categories       map[string]any `json:"categories"`
 }
 
 func ParseSomeDataData(response string) UserProfile {
 	lines := strings.Split(response, "\n")
 	profile := UserProfile{
-		Categories: make(map[string]interface{}),
+		Categories: make(map[string]any),
 	}
 
 	// Регулярки для парсинга ключей и значений
