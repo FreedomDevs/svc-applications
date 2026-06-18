@@ -9,23 +9,35 @@ const (
 )
 
 type ApplicationData struct {
-	id             uint64
-	userid         string
-	age            uint8
+	id             string
+	user_id        string
+	user_ip        string
+	age            uint16
 	about          string
-	join_reason    string
 	inviter        string
-	submitted_at   string
 	ai_categories  *map[string]any
 	ai_decision    ApplicationDecision
-	admin_decision ApplicationDecision
 	ai_answer      string
 	ai_comment     string
+	admin_decision ApplicationDecision
+	admin_id       string
+}
+
+type ApplicationDataShort struct {
+	id             string
+	user_id        string
+	age            uint16
+	about          string
+	inviter        string
+	ai_categories  *map[string]any
+	ai_decision    ApplicationDecision
+	ai_answer      string
+	admin_decision ApplicationDecision
+	admin_id       string
 }
 
 type ApplicationRequest struct {
-	age         uint8
-	about       string
-	join_reason string
-	inviter     string
+	age     uint16
+	about   string
+	inviter string
 }

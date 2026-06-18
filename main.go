@@ -79,94 +79,14 @@ func main() {
 	r.Use(func(c *gin.Context) {
 		c.Set("db", db)
 		c.Set("gemini", client)
+		c.Set("usersServiceUrl", usersServiceUrl)
 		c.Next()
 	})
 
-	r.GET(":id", func(ctx *gin.Context) {
-		db := ctx.MustGet("db").(*sql.DB)
-		id := ctx.Param("id")
-
-		var data ApplicationData
-		err := db.QueryRow(`SELECT id,userid,age,about,join_reason,inviter,submitted_at,ai_categories,ai_decision,admin_decision,ai_answer,ai_comment
-												FROM applications WHERE id = ?`, id).Scan(&data.id, &data.userid, &data.age, &data.about, &data.join_reason, &data.inviter,
-			&data.submitted_at, &data.ai_categories, &data.ai_decision, &data.admin_decision, &data.ai_answer, &data.ai_comment)
-		if err != nil {
-			log.Panicln(err)
-		}
-
-		ctx.JSON(200, data)
-	})
-
-	r.POST("", func(ctx *gin.Context) {
-		gemini := ctx.MustGet("gemini").(*genai.Client)
-		ctx.Writer.Header().Set("Content-Type", "text/event-stream")
-		ctx.Writer.Header().Set("Cache-Control", "no-cache")
-		ctx.Writer.Header().Set("Connection", "keep-alive")
-		ctx.Writer.Header().Set("Transfer-Encoding", "chunked")
-
-		id := ctx.GetHeader("eauth-user-id")
-		if id == "" {
-			ctx.JSON(422, "Пустой заголовок eauth-user-id")
-			return
-		}
-
-		resp, err := http.Get(usersServiceUrl + "/users/" + id)
-		if err != nil {
-			log.Panicln(err)
-		}
-		defer resp.Body.Close()
-
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			log.Println("Ошибка чтения:", err)
-			return
-		}
-
-		var jsonBody map[string]any
-		err = json.Unmarshal(body, &jsonBody)
-		if err != nil {
-			log.Println("Ошибка парсинга json:", err)
-			return
-		}
-
-		username := jsonBody["data"].(map[string]any)["name"].(string)
-
-		var req ApplicationRequest
-		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(422, "Говно запрос, "+err.Error())
-			return
-		}
-
-		ctx.Writer.Write([]byte("Классификация заявки...\n"))
-		ctx.Writer.Flush()
-
-		classify_response, err := first_parser.SendRequest(username, string(req.age), req.join_reason, req.about, req.inviter, context.Background(), gemini)
-		if err != nil {
-			ctx.JSON(422, "Говно ответ от gemini, "+err.Error())
-			return
-		}
-
-		classify_data := first_parser.ParseSomeDataData(classify_response.Text())
-
-		ctx.Writer.Write([]byte("Выносим финальный вердикт...\n"))
-		ctx.Writer.Flush()
-
-		verdict_response, err := final_reviewer.SendRequest(classify_data, username, string(req.age), req.join_reason, req.about, req.inviter, context.Background(), gemini)
-		if err != nil {
-			ctx.JSON(422, "Говно ответ от gemini, "+err.Error())
-			return
-		}
-
-		var verdict_json map[string]string
-		err = json.Unmarshal([]byte(verdict_response.Text()), &verdict_json)
-		if err != nil {
-			ctx.JSON(422, "Говно ответ от gemini, "+err.Error())
-			return
-		}
-
-		fmt.Printf("\n\n%v\n", verdict_json)
-		ctx.Writer.Write([]byte(fmt.Sprintf("{\"action\": \"%s\", \"answer\": \"%s\"}\n", verdict_json["action"], verdict_json["reason"])))
-	})
+	r.GET("/applications/", getAllHandler)
+	r.GET("/applications/:uuid", getByUUIDHandler)
+	r.GET("/applications/me", getMyHandler)
+	r.POST("/applications/create", createApplicationHandler)
 
 	log.Printf("Запуск Gin спустя: %s с начала запуска программы", time.Since(appStart))
 	r.Run(":" + listenPort)

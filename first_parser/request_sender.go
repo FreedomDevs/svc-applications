@@ -21,12 +21,11 @@ func marshalText(input string) string {
 	return s
 }
 
-func SendRequest(nickname string, age string, join_reason string, about string, invited_by string, ctx context.Context, client *genai.Client) (*genai.GenerateContentResponse, error) {
+func SendRequest(nickname string, age string, about string, invited_by string, ctx context.Context, client *genai.Client) (*genai.GenerateContentResponse, error) {
 	prompt := strings.NewReplacer(
 		"%nickname%", marshalText(nickname),
 		"%age%", marshalText(age),
 		"%about%", marshalText(about),
-		"%join_reason%", marshalText(join_reason),
 		"%invited_by%", marshalText(invited_by),
 	).Replace(promptTemplate)
 

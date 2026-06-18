@@ -15,7 +15,7 @@ var promptTemplate string
 //go:embed schema.json
 var schema []byte
 
-func SendRequest(classification first_parser.UserProfile, nickname string, age string, join_reason string, about string, invited_by string, ctx context.Context, client *genai.Client) (*genai.GenerateContentResponse, error) {
+func SendRequest(classification first_parser.UserProfile, nickname string, age string, about string, invited_by string, ctx context.Context, client *genai.Client) (*genai.GenerateContentResponse, error) {
 	var schemaJson any
 	_ = json.Unmarshal(schema, &schemaJson)
 
@@ -31,7 +31,6 @@ func SendRequest(classification first_parser.UserProfile, nickname string, age s
 		"name":                nickname,
 		"age":                 age,
 		"about":               about,
-		"join_reason":         join_reason,
 		"invited_by":          invited_by,
 		"auto_classification": classification,
 	})
