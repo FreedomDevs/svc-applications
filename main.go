@@ -3,13 +3,8 @@ package main
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"strings"
-	"svc-applications/final_reviewer"
-	"svc-applications/first_parser"
 
 	_ "embed"
 	"log"
@@ -31,7 +26,7 @@ func main() {
 	dbName := getEnv("DB_NAME", "svc-applications")
 	dbArgs := getEnv("DB_ARGS", "sslmode=disable")
 	proxiesEnv := getEnv("TRUSTED_PROXIES", "127.0.0.1")
-	listenPort := getEnv("LISTEN_PORT", "9003")
+	listenPort := getEnv("LISTEN_PORT", "80")
 	usersServiceUrl := getEnv("USERS_SERVICE_URL", "http://[fd98:2dd6:8f48:1d99:dc28:e6e1::2]:80")
 
 	log.Printf("Подключение к postgres://%s:XXXXX@%s/%s?%s\n", dbUser, dbAddress, dbName, dbArgs)
